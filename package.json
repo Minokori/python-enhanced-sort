@@ -1,0 +1,95 @@
+{
+  "name": "minokori-python-enhanced-sort",
+  "displayName": "Python Enhanced Sort",
+  "description": "Enhance your auto formatting for Python. It sorts your methods, properties, and dunder methods in your Class",
+  "version": "0.0.1",
+  "author": "minokori",
+  "license":"MIT",
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": [
+    "Formatters",
+    "Other",
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:python"
+  ],
+  "main": "./out/extension.js",
+  "icon": "./src/imgs/icon.png",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Python Enhanced Sort",
+      "properties": {
+        "PythonEnhancedSort.Mode": {
+          "type": "string",
+          "default": "insert",
+          "enum": [
+            "insert",
+            "inplace",
+            "console"
+          ],
+          "enumItemLabels": [
+            "insert",
+            "inplace",
+            "console"
+          ],
+          "enumDescriptions": [
+            "insert sortted contents into file's end, and comments origin texts",
+            "DELETE your source code, and insert sortted code instead. NOT RECOMMEND",
+            "logging to console"
+          ],
+          "definitions": "edit mode. cause it's preview still, recommend to use 'INSERT' rather than 'INPLACE' mode"
+        },
+        "PythonEnhancedSort.ignoreFiles": {
+          "type": "array",
+          "default": [
+            "main.py",
+            "__init__.py"
+          ],
+          "description": "ignored files."
+        },
+        "PythonEnhancedSort.Weights": {
+          "type": "array",
+          "default": [
+            "init",
+            "to",
+            "as"
+          ],
+          "description": "if your wish sort your method name begin with specified words, please add them in this list."
+        },
+        "PythonEnhancedSort.Debug.Console": {
+          "type": "boolean",
+          "default": true,
+          "definitions": "Logging to Console."
+        },
+        "PythonEnhancedSort.Debug.Information": {
+          "type": "boolean",
+          "default": false,
+          "definitions": "Logging in Information."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.96.0",
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "@typescript-eslint/parser": "^8.18.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1",
+    "eslint": "^9.17.0",
+    "typescript": "^5.7.2"
+  }
+}
