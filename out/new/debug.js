@@ -37,12 +37,17 @@ exports.log = log;
 const vscode = __importStar(require("vscode"));
 let MESSAGE = vscode.workspace.getConfiguration("PythonEnhancedSort.Debug").get("Information");
 let LOG = vscode.workspace.getConfiguration("PythonEnhancedSort.Debug").get("Console");
+let outputChannel = vscode.window.createOutputChannel("Python Enhanced Sort", "python");
+/**
+ * 输出日志到设置中指定的位置.
+ * @param message 日志消息
+ */
 function log(message) {
     if (MESSAGE) {
         vscode.window.showInformationMessage(message);
     }
     if (LOG) {
-        console.log(message);
+        outputChannel.appendLine(`[${new Date().toLocaleTimeString()}] ${message}`);
     }
 }
 //# sourceMappingURL=debug.js.map

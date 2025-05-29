@@ -4,34 +4,60 @@ import { infer_line_type_by_text } from './infer';
 import { log } from "./debug";
 import { method_name, special_variable } from './regexp';
 import { compare_tag } from './utils';
+
+/** 文档的所有代码行 */
 let ToTalContents: vscode.TextLine[] = [];
-/**代码行的类型 [缩进级别][行号]
+
+
+/** 文档代码类型
  *
- * 举例
+ * ToTalContents[depth][line]:
  *
- * 类的一个 def 在[0][line] 下是 inner block，
- * 在 [1][line] 下是 def block
- *  */
+ * 文档的索引为 `line` 行, 在忽略前 `depth * 4` 个字符的条件下, 剩余的字符串的代码类型
+ *
+ */
 let ToTalContentTypes: CodeType[][] = [];
+
+/** 文档遍历指针, 用于指示 **仍未被解析的** 文档最小行号*/
 let pointer = 0;
+
+/** 文件的行数 */
 let Length = 0;
+
+/** 解析的最大深度 */
 let MaxDepth = 0;
+
+/**
+ * 解析文档
+ * @param document 要解析的文档
+ * @param depth 解析的深度
+ */
 export function ConvertToLines(document: vscode.TextDocument, depth: number = 2): void {
     MaxDepth = depth;
+
+    // 初始化变量
     pointer = 0;
     Length = document.lineCount;
     ToTalContents = [];
     ToTalContentTypes = [];
+
+    // 缓存文档
     for (let index = 0; index < Length; index++) {
         ToTalContents.push(document.lineAt(index));
     }
 
-    for (let i = 0; i < MaxDepth; i++) {
-        let l = [];
+    // 从深度为 0 开始遍历到最大深度
+    for (let depth = 0; depth < MaxDepth; depth++) {
+
+        /** ToTalContentTypes[depth] */
+        let l: CodeType[] = [];
+
+    // 从行索引为 0 开始遍历到文件末尾
         for (let line_number = 0; line_number < Length; line_number++) {
             let line = ToTalContents[line_number];
-            // 可能报错，由于预处理指令
-            l.push(infer_line_type_by_text(line.text.substring(i * 4)));
+
+            // 当文件中存在预处理指令时, 会报错
+            l.push(infer_line_type_by_text(line.text.substring(depth * 4)));
         }
         ToTalContentTypes.push(l);
     }
@@ -41,15 +67,36 @@ export function ConvertToLines(document: vscode.TextDocument, depth: number = 2)
 
 
 export class CodeBlock {
+    /**代码块类型 */
     type: CodeType;
+
+    /** 代码块的缩进级别.
+     *
+     * 全局代码为 0, doc 规定为 -1
+    */
     intent_level: number;
-    startline: number;//包含
-    endline: number;//(不包含)
+
+    /** 代码块的起始行号 (包含) */
+    startline: number;
+
+    /** 代码块的结束行号 (**不**包含) */
+    endline: number;
+
+    /** 代码块的子代码块 */
     children: CodeBlock[] = [];
+
+    /** 代码块的标签 */
     tags: string[] = [];
+
+    /**
+     *
+     * @param type 代码块类型
+     * @param intent_level 代码块的缩进级别, 全局代码为 0, `vscode.TextDocument` 的缩进级别规定为 -1
+     * @param startline 代码块的起始行号 (包含)
+     * @param endline 代码块的结束行号 (**不**包含)
+     */
     constructor(type: CodeType, intent_level: number, startline: number, endline: number) {
         this.type = type;
-        /**代码块的缩进级别。全局代码是0, doc 规定为-1*/
         this.intent_level = intent_level;
         this.startline = startline;
         this.endline = endline;
@@ -60,12 +107,11 @@ export class CodeBlock {
     }
 
     /**
-     *
-     * @returns 拼接源代码，不调用sort的话期望用它返回该代码块的源代码
+     * @returns 拼接源代码，不调用 `sort` 的话期望用它返回该代码块的源代码
      */
     toString(): string {
         let source_code = "";
-        // 原子块
+        // 原子块 (内部没有其他代码块)
         if (this.children.length === 0) {
             for (let index = this.startline; index < this.endline; index++) {
                 source_code += ToTalContents[index].text;
@@ -73,7 +119,7 @@ export class CodeBlock {
                 //source_code += vscode.workspace.getConfiguration("Files").get("eol");
             }
         }
-        // 非原子块
+        // 非原子块 (内部包含其他代码块)
         if (this.type !== CodeType.DOCUMENT && this.children.length > 0) {
             for (let index = this.startline; index < this.children[0].startline; index++) {
                 source_code += ToTalContents[index].text;
@@ -109,18 +155,19 @@ export class CodeBlock {
 
     /** 读取源文档的 import 代码块
      *
-     * 注意：假设源文档已经被 isort 和 autopep8 格式化过（即 最后一个import 代码行下有两个空格）
-     * @returns 1.
-     * @returns 2. import 代码块
+     * **注意:** 假设源文档已经被 `isort` 和 `autopep8` 格式化过（即 最后一个import 代码行下有两个空格）
+     * @returns import 代码块
      */
     private init_import_block(): CodeBlock {
-        let end = ToTalContentTypes[0].findLastIndex(item => item === CodeType.IMPORT);
+        let import_end = ToTalContentTypes[0].findLastIndex(item => item === CodeType.IMPORT);
+
         // 如果import语句发生了换行
-        while (ToTalContentTypes[0][end + 1] === CodeType.INNER) {
-            end++;
+        while (ToTalContentTypes[0][import_end + 1] === CodeType.INNER) {
+            import_end++;
         }
-        log(`import 代码块: Line 1 - ${end + 1}`);
-        pointer = end + 1;
+
+        log(`import 代码块: Line 1 - ${import_end + 1}`);
+        pointer = import_end + 1;
         return new CodeBlock(CodeType.IMPORT, 0, 0, pointer);
     }
 
@@ -157,7 +204,7 @@ export class CodeBlock {
 
     /**
      * 查找单个代码块
-     * @param start_line_number 开始查找的行号 (0-based, 包含)
+     * @param start_line_number 开始查找的行索引 (0-based, 包含)
      * @param block_type 代码块是否为类或者方法
      * @returns 1. 代码块的起始行号 (包含, 包含前导空行)
      * @returns 2. 代码块的结束行号 (不包含, 不包含后置空行)
@@ -165,6 +212,7 @@ export class CodeBlock {
      */
     private get_single_block(start_line_number: number, block_type: CodeType): [start: number, end: number, next_line_number: number] {
         //BUG 把换行注释弄成一个块
+
         //#region 先倒序找，确保找到了函数/类的wrapper
         //只有class 跟 method需要
         let true_block_begin: number;
@@ -225,7 +273,7 @@ export class CodeBlock {
     /**
      * 为指定代码行包含前导空行
      * @param line_num 代码块起始行号 (包括)
-     * @returns 包含所有前导空行的代码起始行。假如第 n 行前面有3个空行，则返回 n-3
+     * @returns 包含所有前导空行的代码起始行。假如第 `n` 行前面有 `3` 个空行，则返回 `n-3`
      */
     private find_prefix_whitelines_line_num(line_num: number): number {
         return ToTalContentTypes[this.intent_level + 1].slice(0, line_num).findLastIndex(item => item !== CodeType.WHITELINE) + 1;
@@ -311,8 +359,14 @@ export class CodeBlock {
     }
     //a在b前返回 < 0 的数;
 
+    /**
+     * 同 depth 代码块排序函数
+     * @param a 要比较的代码块
+     * @param b 要比较的代码块
+     * @returns 若 `a` 在 `b` 前面，则返回小于 0 的数；若 `a` 在 `b` 后面，则返回大于 0 的数；若相等则返回 0
+     */
     private static sort_func(a: CodeBlock, b: CodeBlock): number {
-        //先比type,type小的放前面
+        //先比type, type小的放前面
         if (a.type !== b.type) {
             return (a.type - b.type);
         }

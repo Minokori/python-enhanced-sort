@@ -4,7 +4,10 @@ exports.infer_line_type_by_text = infer_line_type_by_text;
 const regexp_1 = require("./regexp");
 const enum_1 = require("./enum");
 /**
- * 根据文本判断代码行的类别
+ * 根据文本判断 **代码行** 的类别
+ *
+ * ***文本不包括前导空格***
+ *
  * @param text 文本
  * @returns 代码行类别
  */

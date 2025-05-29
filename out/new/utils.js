@@ -36,6 +36,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.compare_tag = compare_tag;
 const vscode = __importStar(require("vscode"));
 let keywords = vscode.workspace.getConfiguration("PythonEnhancedSort").get("Weights");
+/**
+ * 比较两个单词的优先级
+ *
+ * *若 word1 在保留关键字列表中且在 word2 之前，则返回负数；若 word2 在保留关键字列表中且在 word1 之前，则返回正数；若两个单词都不在保留关键字列表中，则按字母顺序排序*
+ * @param word1 要比较的单词
+ * @param word2 要比较的单词
+ * @returns 比较结果
+ */
 function compare_tag(word1, word2) {
     let idx1 = keywords.indexOf(word1);
     let idx2 = keywords.indexOf(word2);

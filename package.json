@@ -4,7 +4,7 @@
   "description": "Enhance your auto formatting for Python. It sorts your methods, properties, and dunder methods in your Class",
   "version": "0.0.1",
   "author": "minokori",
-  "license":"MIT",
+  "license": "MIT",
   "engines": {
     "vscode": "^1.95.0"
   },
@@ -83,7 +83,7 @@
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
-    "@types/node": "20.x",
+    "@types/node": "^20.17.52",
     "@types/vscode": "^1.96.0",
     "@typescript-eslint/eslint-plugin": "^8.18.0",
     "@typescript-eslint/parser": "^8.18.0",

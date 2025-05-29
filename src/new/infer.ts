@@ -2,16 +2,22 @@ import { ignore_command, special_variable, variable } from "./regexp";
 import { CodeType } from "./enum";
 
 /**
- * 根据文本判断代码行的类别
+ * 根据文本判断 **代码行** 的类别
+ *
+ * ***文本不包括前导空格***
+ *
  * @param text 文本
  * @returns 代码行类别
  */
 export function infer_line_type_by_text(text: string): CodeType {
-    let result = null;
+
+    let result: CodeType | null = null;
+
     // 空行
     if (text.length === 0 || text.trim().length === 0) {
         result = CodeType.WHITELINE;
     }
+
     // 字符数少于 4 只可能是注释或声明变量
     else if (text.length < 4) {
         if (text.startsWith("#")) {
@@ -24,6 +30,7 @@ export function infer_line_type_by_text(text: string): CodeType {
             result = CodeType.VARIABLE;
         }
     }
+
     // 判断这个代码块是 类，函数，导入，缩进
     switch (text.substring(0, 4)) {
         case "clas":
@@ -37,7 +44,6 @@ export function infer_line_type_by_text(text: string): CodeType {
             result = CodeType.IMPORT;
             break;
         case "    ":
-
             result = CodeType.INNER;
             break;
         default:
