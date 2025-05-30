@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 let MESSAGE = vscode.workspace.getConfiguration("PythonEnhancedSort.Debug").get("Information") as boolean;
 let LOG = vscode.workspace.getConfiguration("PythonEnhancedSort.Debug").get("Console") as boolean;
 
-let outputChannel = vscode.window.createOutputChannel("Python Enhanced Sort", "python");
+let outputChannel = vscode.window.createOutputChannel("Python Enhanced Sort", "Python");
 
 /**
  * 输出日志到设置中指定的位置.
@@ -14,6 +14,7 @@ export function log(message: string) {
         vscode.window.showInformationMessage(message);
     }
     if (LOG) {
-        outputChannel.appendLine(`[${new Date().toLocaleTimeString()}] ${message}`);
+        outputChannel.appendLine(`${message}`);
+
     }
 }

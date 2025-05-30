@@ -72,7 +72,7 @@ function onWillSaveTextDocument(event) {
         }
         /** 文档对应的 `CodeBlock` 对象作为根节点 */
         let b = new CodeBlock_1.CodeBlock(enum_1.CodeType.DOCUMENT, -1, 0, event.document.lineCount);
-        /** 插件工作模式, "insert" 或 "inplace" */
+        /** 插件工作模式, `"insert"` 或 `"inplace"` */
         let mode = vscode.workspace.getConfiguration("PythonEnhancedSort").get("Mode");
         /** 文档原本的代码内容 */
         let source_code = event.document.getText();

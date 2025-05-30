@@ -52,11 +52,18 @@ function infer_line_type_by_text(text) {
         if (text.match(regexp_1.ignore_command)) {
             throw new Error(`ignore command found`);
         }
+        // 类型检查
+        else if (text.startsWith("if TYPE_CHECKING")) {
+            result = enum_1.CodeType.TYPE_CHECKING;
+        }
         // 注释
         else if (text.startsWith("#")) {
             result = enum_1.CodeType.COMMENT;
         }
-        else if (text.startsWith('"""')) {
+        else if ((text.startsWith('"""') || text.startsWith('r"""')) && text.endsWith('"""')) {
+            result = enum_1.CodeType.COMMENT;
+        }
+        else if (text.startsWith('"""') || text.startsWith('r"""')) {
             result = enum_1.CodeType.COMMENTBLOCK;
         }
         // 双下划线变量声明

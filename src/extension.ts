@@ -38,7 +38,7 @@ function onWillSaveTextDocument(event: vscode.TextDocumentWillSaveEvent) {
         /** 文档对应的 `CodeBlock` 对象作为根节点 */
         let b = new CodeBlock(CodeType.DOCUMENT, -1, 0, event.document.lineCount);
 
-        /** 插件工作模式, "insert" 或 "inplace" */
+        /** 插件工作模式, `"insert"` 或 `"inplace"` */
         let mode = vscode.workspace.getConfiguration("PythonEnhancedSort").get("Mode") as string;
 
         /** 文档原本的代码内容 */
