@@ -227,13 +227,13 @@ class CodeBlock {
         //后面没找到空行或缩进行，说明直到文件末尾都是要找的范围
         if (next_block_begin_line_number === undefined) {
             let true_block_end = Length;
-            (0, debug_1.log)(`${this.log_intent}${enum_1.CodeType[block_type]}: ${begin + 1}-${true_block_end}`);
+            //log(`${this.log_intent}${CodeType[block_type]}: ${begin + 1}-${true_block_end}`);
             return [begin, true_block_end, Length];
         }
         //找到下一个代码块的第一行，从这一行倒着把空行排除
         else {
             let true_block_end = this.find_prefix_whitelines_or_comment_line_num(next_block_begin_line_number);
-            (0, debug_1.log)(`${this.log_intent}${enum_1.CodeType[block_type]}: ${begin + 1}-${true_block_end}`);
+            //log(`${this.log_intent}${CodeType[block_type]}: ${begin + 1}-${true_block_end}`);
             if (block_type === enum_1.CodeType.COMMENTBLOCK) {
                 return [begin, true_block_end + 1, next_block_begin_line_number + 1];
             }

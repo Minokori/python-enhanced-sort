@@ -1,12 +1,13 @@
 {
+  "publisher": "minokori-ayazana",
   "name": "minokori-python-enhanced-sort",
   "displayName": "Python Enhanced Sort",
   "description": "Enhance your auto formatting for Python. It sorts your methods, properties, and dunder methods in your Class",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "minokori",
   "license": "MIT",
   "engines": {
-    "vscode": "^1.95.0"
+    "vscode": "^1.96.0"
   },
   "categories": [
     "Formatters",
@@ -16,6 +17,9 @@
   "activationEvents": [
     "onLanguage:python"
   ],
+  "repository": {
+    "url": "https://github.com/Minokori/python-enhanced-sort.git"
+  },
   "main": "./out/extension.js",
   "icon": "./src/imgs/icon.png",
   "contributes": {
@@ -63,7 +67,7 @@
         "PythonEnhancedSort.Debug.Console": {
           "type": "boolean",
           "default": true,
-          "definitions": "Logging to Console."
+          "definitions": "Logging to vscode's `output` panel."
         },
         "PythonEnhancedSort.Debug.Information": {
           "type": "boolean",
